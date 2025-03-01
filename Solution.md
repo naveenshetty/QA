@@ -1,6 +1,6 @@
 ## Assignment Part - 1
 
-### Question 1: Manual test case provided in Excel sheet refer sheet 
+### Question 1: Manual test case provided in Excel sheet refer sheet [here](https://github.com/naveenshetty/QA/blob/main/Manual_Test_Cases.xlsx) 
 
 ### Automated Test Cases
 
