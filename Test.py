@@ -18,6 +18,13 @@ class Order:
     def calculate_total(self):
         return sum(item["price"] * item["quantity"] for item in self.items)
 
+    def convert_currency(self, amount, from_currency, to_currency):
+        """Mocking an external API call for currency conversion."""
+        exchange_rates = {"USD": 1, "EUR": 1.1, "GBP": 1.3}  # Mocked rates
+        if from_currency not in exchange_rates or to_currency not in exchange_rates:
+            raise ValueError("Unsupported currency")
+        return amount * (exchange_rates[to_currency] / exchange_rates[from_currency])
+
 
 # Test for add valid item
 @patch.object(Order, 'add_item_to_order', autospec=True)
@@ -68,6 +75,26 @@ def place_order(user_id):
     order = Order()
     order.add_item_to_order(f"Iphone_{user_id}", 1000, 1, "USD")
     print(f"User {user_id}: Order Total = {order.calculate_total()}")
+
+
+# Mock exchange rate conversion API response
+@patch.object(Order, 'convert_currency', return_value=1100)
+def test_currency_conversion(mock_convert):
+    order = Order()
+    order.add_item_to_order("Laptop", 1000, 1, "USD")
+
+    converted_price = order.convert_currency(order.items[0]["price"], "USD", "EUR")
+    assert converted_price == 1100
+    mock_convert.assert_called_with(1000, "USD", "EUR")
+
+
+def test_add_item_different_currencies():
+    order = Order()
+    order.add_item_to_order("Laptop", 1000, 1, "USD")
+    order.add_item_to_order("Monitor", 850, 1, "EUR")
+
+    assert order.items[0]["currency"] == "USD"
+    assert order.items[1]["currency"] == "EUR"
 
 
 def test_simultaneous_orders():
