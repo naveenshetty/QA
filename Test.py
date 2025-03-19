@@ -1,6 +1,7 @@
-import pytest
-from unittest.mock import MagicMock, patch
 import threading
+from unittest.mock import patch
+
+import pytest
 
 
 # Mocking the Order class
