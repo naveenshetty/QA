@@ -26,13 +26,48 @@ class Order:
             raise ValueError("Unsupported currency")
         return amount * (exchange_rates[to_currency] / exchange_rates[from_currency])
 
+    def view_order_summary(self):
+        """Returns the list of items in the order along with the total cost."""
+        return {
+            "items": self.items,
+            "total_cost": self.calculate_total()
+        }
+
 
 # Test for add valid item
-@patch.object(Order, 'add_item_to_order', autospec=True)
+@patch.object(Order, 'add_item_to_order', autospec=True, side_effect=Order.add_item_to_order)
 def test_add_valid_item(mock_add_item):
     order = Order()
     order.add_item_to_order("Iphone", 1000, 2, "USD")
     mock_add_item.assert_called_with(order, "Iphone", 1000, 2, "USD")
+
+    order_summary = order.view_order_summary()
+    print("\nOrder Summary:")
+    print(order_summary)
+
+    # Verify the expected order summary
+    expected_summary = {
+        "items": [{"item_name": "Iphone", "price": 1000, "quantity": 2, "currency": "USD"}],
+        "total_cost": 2000
+    }
+    assert order_summary == expected_summary
+
+
+def test_view_order_summary():
+    order = Order()
+    order.add_item_to_order("Laptop", 1000, 1, "USD")
+    order.add_item_to_order("Phone", 500, 2, "USD")
+
+    expected_summary = {
+        "items": [
+            {"item_name": "Laptop", "price": 1000, "quantity": 1, "currency": "USD"},
+            {"item_name": "Phone", "price": 500, "quantity": 2, "currency": "USD"},
+        ],
+        "total_cost": 2000
+    }
+
+    assert order.view_order_summary() == expected_summary
+    # print(order.view_order_summary())
 
 
 # Test for handling all the invalid item/scenarios
